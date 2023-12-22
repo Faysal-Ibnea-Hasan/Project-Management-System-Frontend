@@ -67,7 +67,7 @@
                     <svg class="flex-shrink-0 w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z" />
                     </svg>
-                    Log in
+                    {{ this.name }}
                 </a>
             </div>
         </div>
@@ -76,18 +76,38 @@
 </template>
 
 <script>
+import axios from 'axios';
+axios
 export default {
     name: "NavComponent",
+    data() {
+        return {
+            id: JSON.parse(localStorage.getItem("student-details")),
+            name:""
+        }
+    },
     methods: {
+        async get_data() {
+            let get_data = await axios.post("http://127.0.0.1:8000/api/student_get_by_student_Id", {
+                student_Id: this.id
+            })
+            if(get_data.data.status == true) {
+                this.name = get_data.data.data.name
+            }
+            //console.warn(get_data)
+        },
         logout() {
             localStorage.removeItem('student-details');
+            localStorage.removeItem('group-details');
             this.$router.push({
                 name: "LoginView"
             })
         }
+    },
+    mounted(){
+        this.get_data();
     }
 }
-
 </script>
 
 <style>
